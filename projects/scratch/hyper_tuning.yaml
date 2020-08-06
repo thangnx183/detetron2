@@ -3,7 +3,7 @@ trainingInput:
   masterType: complex_model_m_p100
   hyperparameters: 
     goal: MAXIMIZE
-    maxtrials: 30
+    maxTrials: 30
     maxParallelTrials: 1
     hyperparameterMetricTag: dice_tuning_tag
     enableTrialEarlyStopping: True
