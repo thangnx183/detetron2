@@ -126,7 +126,7 @@ def do_test(cfg,model):
             vis = visualizer.draw_instance_predictions(out['instances'].to('cpu'))
             #print('mask :',torch.sum(out['instances'].pred_masks,dim=0).shape)
             cv2.imwrite('./result/'+i['file_name'][23:],vis.get_image()[:,:,::-1])
-    print('test samples : 'num)
+    print('test samples : ',num)
     dice = dice_sum/num
     print('dice coefficent: ',dice)
 
