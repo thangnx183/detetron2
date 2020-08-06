@@ -105,7 +105,7 @@ def do_test(cfg,model):
     print('len validation:',len(val_dicts))
     num = 0
     #print(val_dicts[302]['annotations'])
-    return 0
+    #return 0
     for i in val_dicts:
         img = cv2.imread(i['file_name'])
         gt_mask = get_gt_mask(fs,i['image_id'])
@@ -126,7 +126,7 @@ def do_test(cfg,model):
             vis = visualizer.draw_instance_predictions(out['instances'].to('cpu'))
             #print('mask :',torch.sum(out['instances'].pred_masks,dim=0).shape)
             cv2.imwrite('./result/'+i['file_name'][23:],vis.get_image()[:,:,::-1])
-    print(num)
+    print('test samples : 'num)
     dice = dice_sum/num
     print('dice coefficent: ',dice)
 
@@ -266,7 +266,7 @@ def main(args):
     #---- register all dataset
     register_coco_instances(name_train,{},json_train_file,image_train_root)
     register_coco_instances(name_val,{},json_val_file,image_val_root)
-    register_coco_instances(name_test,{},json_test_file,image_test_root)
+    #register_coco_instances(name_test,{},json_test_file,image_test_root)
 
     model = build_model(cfg)
     #logger.info("Model:\n{}".format(model))
