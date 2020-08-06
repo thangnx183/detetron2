@@ -2,7 +2,7 @@ FROM nvidia/cuda:10.1-cudnn7-devel
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
-	python3-opencv ca-certificates python3-dev git wget sudo  \
+	python3-opencv python3-dev ca-certificates python3-distutils git wget sudo  \
 	cmake ninja-build protobuf-compiler libprotobuf-dev && \
   rm -rf /var/lib/apt/lists/*
 RUN ln -sv /usr/bin/python3 /usr/bin/python
@@ -38,7 +38,12 @@ RUN pip install --user -e detectron2_repo
 
 # Set a fixed model cache directory.
 ENV FVCORE_CACHE="/tmp"
-WORKDIR /home/appuser/detectron2_repo
+WORKDIR /home/appuser/detectron2_repo/projects/ai_scratch
+
+# install cloud storge and hypertune
+RUN pip install pandas google-cloud-storage cloudml-hypertune
+
+#ENTRYPOINT ["python3","plain_train_net.py","--num_gpus","1"]
 
 # run detectron2 under user "appuser":
 # wget http://images.cocodataset.org/val2017/000000439715.jpg -O input.jpg
