@@ -1,56 +1,65 @@
-<img src=".github/Detectron2-Logo-Horz.svg" width="300" >
+#0. access server
+```
+sudo ssh -i google_compute_engine.dms dev@34.105.49.114
+cd ~/thang/detectron2/
+```
+#1. install google cloud and login
+https://cloud.google.com/sdk/docs
+```
+gcloud auth login
+```
 
-Detectron2 is Facebook AI Research's next generation software system
-that implements state-of-the-art object detection algorithms.
-It is a ground-up rewrite of the previous version,
-[Detectron](https://github.com/facebookresearch/Detectron/),
-and it originates from [maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark/).
+#2. create image
+```
+export PROJECT_ID=ai-project-231602
+export JOB_DIR=gs://hptuning_scratch
+export IMAGE_REPO_NAME=scartch_tuning_container
+export IMAGE_TAG=scratch_tuning
+export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
+export REGION=us-west1
+export JOB_NAME=hp_tuning_scratch_container_job_$(date +%Y%m%d_%H%M%S)
 
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/1381301/66535560-d3422200-eace-11e9-9123-5535d469db19.png"/>
-</div>
+docker build --no-cache --build-arg USER_ID=$UID -f Dockerfile -t $IMAGE_URI ./
+```
 
-### What's New
-* It is powered by the [PyTorch](https://pytorch.org) deep learning framework.
-* Includes more features such as panoptic segmentation, densepose, Cascade R-CNN, rotated bounding boxes, etc.
-* Can be used as a library to support [different projects](projects/) on top of it.
-  We'll open source more research projects in this way.
-* It [trains much faster](https://detectron2.readthedocs.io/notes/benchmarks.html).
+#3. test docker (optional)
+```
+docker run $IMAGE_URI
+```
 
-See our [blog post](https://ai.facebook.com/blog/-detectron2-a-pytorch-based-modular-object-detection-library-/)
-to see more demos and learn about detectron2.
+#4. find ID images
+```
+docker images
+```
+#5.push images to google cloud (may encounter bug but keep pushing until it done)
+// replace IMAGES_ID  which have tag "scratch_tuning" to images_ID
+```
+docker tag images_ID $IMAGE_URI
+docker push $IMAGE_URI
+```
+#5.tuning
+```
+cd scratch
 
-## Installation
+export JOB_NAME=hp_tuning_container_job_$(date +%Y%m%d_%H%M%S)
+gcloud beta ml-engine jobs submit training $JOB_NAME \
+  --job-dir=$JOB_DIR \
+  --region=$REGION \
+  --master-image-uri $IMAGE_URI \
+  --config=hyper_tuning.yaml
 
-See [INSTALL.md](INSTALL.md).
+```
 
-## Quick Start
+#6. check model
+```
+gsutil ls gs://hptuning/*
+```
 
-See [GETTING_STARTED.md](GETTING_STARTED.md),
-or the [Colab Notebook](https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5).
-
-Learn more at our [documentation](https://detectron2.readthedocs.org).
-And see [projects/](projects/) for some projects that are built on top of detectron2.
-
-## Model Zoo and Baselines
-
-We provide a large set of baseline results and trained models available for download in the [Detectron2 Model Zoo](MODEL_ZOO.md).
-
-
-## License
-
-Detectron2 is released under the [Apache 2.0 license](LICENSE).
-
-## Citing Detectron2
-
-If you use Detectron2 in your research or wish to refer to the baseline results published in the [Model Zoo](MODEL_ZOO.md), please use the following BibTeX entry.
-
-```BibTeX
-@misc{wu2019detectron2,
-  author =       {Yuxin Wu and Alexander Kirillov and Francisco Massa and
-                  Wan-Yen Lo and Ross Girshick},
-  title =        {Detectron2},
-  howpublished = {\url{https://github.com/facebookresearch/detectron2}},
-  year =         {2019}
-}
+#7. download model
+```
+gsutil cp gs://hptuning/path/to/model
+```
+#8. remove images
+```
+sudo docker rmi -f images_ID
 ```
