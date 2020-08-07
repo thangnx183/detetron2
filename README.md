@@ -39,7 +39,7 @@ docker push $IMAGE_URI
 ```
 #5.tuning
 ```
-cd scratch
+cd prscratch
 
 export JOB_NAME=hp_tuning_container_job_$(date +%Y%m%d_%H%M%S)
 gcloud beta ml-engine jobs submit training $JOB_NAME \
