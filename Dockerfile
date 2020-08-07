@@ -44,13 +44,13 @@ ENV FVCORE_CACHE="/tmp"
 RUN pip install pandas google-cloud-storage cloudml-hypertune
 
 WORKDIR /home/appuser/detectron2_repo/projects/scratch
-COPY ./scratch_data ./
+COPY ./projects/scratch ./
 #RUN chown appuser ./model_final_2d9806.pkl
 #COPY ./model_final_2d9806.pkl ./
 # install cloud storge and hypertune
 #RUN pip install pandas google-cloud-storage cloudml-hypertune
 
-ENTRYPOINT ["python3","plain_train_net.py","--num-gpus","1"]
+ENTRYPOINT ["python3","plain_train_net.py","--num-gpus","4"]
 
 # run detectron2 under user "appuser":
 # wget http://images.cocodataset.org/val2017/000000439715.jpg -O input.jpg
